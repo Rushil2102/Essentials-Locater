@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="hero-section" style="background-image: url('{{ url_for('static', filename='images/Untitled design1.png') }}');">
+  <div class="container text-center">
+    <h1>Essentials Locater</h1>
+    <p>Find Essentials at your convinient location</p>
+    <a href="{{ url_for('display_grounds') }}" class="btn btn-primary">Find Shops</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSelUBffZ7IMWqLjNfOHZPNLR8z3DIWRrrSbtzRx2gLY6i2lVA/viewform?usp=sf_link" class="btn btn-secondary" target="_blank">Add Information</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,212 @@
+  {% extends "base.html" %}
+  {% block title %}Add Shop{% endblock %}
+
+  {% block content %}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grounds</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      .card {
+        height: auto;
+        margin: 10px;
+        cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+      }
+      .card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+        transition: box-shadow 0.3s ease, transform 0.3s ease;
+      }
+      /* Ensure images have consistent dimensions */
+      .card-img-top {
+        width: 100%;
+        height: 200px; /* Adjust this value as needed */
+        object-fit: cover; /* Ensure images maintain aspect ratio and cover the container */
+      }
+      .advertise1 {
+        background-color: #2b79ff;
+      }
+      .modal-section {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        position: relative;
+        display: flex;
+        flex-direction: row;
+      }
+      .close {
+        color: #aaa;
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      #modalImageContainer {
+        width: 40%;
+        padding-right: 20px;
+      }
+      #modalImageContainer img {
+        max-width: 100%;
+        height: auto;
+      }
+      #modalDetails {
+        width: 60%;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div class="container mt-5">
+        <div class="container advertise1 p-5 my-5 text-white">
+            <h2>Essentials Locater</h2>
+        </div>
+    
+        <!-- Search input field -->
+        <div class="input-group mb-3">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by area...">
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="searchButton">Search</button>
+          </div>
+        </div>
+    
+        <!-- Filter buttons -->
+        <div class="btn-group mb-3" role="group" aria-label="Filter by shop type">
+            <button type="button" class="btn btn-secondary filter-btn active" data-filter="">All</button>
+            <button type="button" class="btn btn-secondary filter-btn" data-filter="public washroom">Public Washroom</button>
+            <button type="button" class="btn btn-secondary filter-btn" data-filter="petrol pump">Petrol Pump</button>
+            <button type="button" class="btn btn-secondary filter-btn" data-filter="medical store">Medical Store</button>
+            <button type="button" class="btn btn-secondary filter-btn" data-filter="grocery store">Grocery Store</button>
+            <button type="button" class="btn btn-secondary filter-btn" data-filter="gym">Gym</button>
+            <button type="button" class="btn btn-secondary filter-btn" data-filter="bank">Bank</button>
+            <!-- Add more buttons for other shop types as needed -->
+        </div>
+    
+        <div class="row" id="groundsContainer">
+            {% for ground in shop %}
+            <div class="col-md-4" data-area="{{ ground.area }}" data-shop-type="{{ ground.shop_type | lower }}">
+                <div class="card" onclick="openModal('{{ ground.shop_name }}', '{{ ground.location }}','{{ ground.area }}', '{{ ground.shop_type }}', '{{ ground.contact_number }}', '{{ url_for('static', filename='images/' + ground.image) }}','{{ ground.location_url }}')">
+                    <img src="{{ url_for('static', filename='images/' + ground.image) }}" class="card-img-top" alt="">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ ground.shop_name }}</h5>
+                        <div class="d-flex align-items-center mb-2">
+                          <strong>Location:</strong> <a href="{{ ground.location_url }}" target="_blank" style="font-size: 18px;">{{ ground.location }}</a>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                          <strong>Category:</strong> <a style="font-size: 18px;" target="_blank"><b>{{ ground.shop_type }}</b></a>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                          <strong>Contact:</strong> <a style="font-size: 18px;" href="tel:{{ ground.contact_number }}" target="_blank">{{ ground.contact_number }}</a>
+                      </div>
+                      <div class="d-flex align-items-center mb-2">
+                          <strong>Area:</strong> {{ ground.area }}
+                      </div>
+                      
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Modal-like section -->
+    <div id="modalSection" class="modal-section">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalImageContainer"><img id="modalImage" src="" alt="Shop Image"></div>
+            <div id="modalDetails"></div>
+        </div>
+    </div>
+    
+    <script>
+      function openModal(shopName, location, area, shopType, contactNumber, imageUrl, locationUrl) {
+          var modalSection = document.getElementById("modalSection");
+          var modalImage = document.getElementById("modalImage");
+          var modalDetails = document.getElementById("modalDetails");
+    
+          // Set the src attribute of the modal image
+          modalImage.src = imageUrl;
+    
+          // Update modal details
+          modalDetails.innerHTML = "<h2>" + shopName + " Details</h2>" +
+              "<p><strong>Location:</strong> <a href='" + locationUrl + "' target='_blank'>" + location + "</a></p>" +
+              "<p><strong>Area:</strong> " + area + "</p>" +
+              "<p><strong>Shop Type:</strong> " + shopType + "</p>" +
+              "<p><strong>Contact Number:</strong> <a href='tel:" + contactNumber + "' target='_blank'>" + contactNumber + "</a></p>";
+    
+          modalSection.style.display = "block";
+      }
+    
+      function closeModal() {
+          var modalSection = document.getElementById("modalSection");
+          modalSection.style.display = "none";
+      }
+    
+      // Function to filter grounds based on search input and selected filter category
+      function filterGrounds() {
+          var searchValue = document.getElementById("searchInput").value.toLowerCase();
+          var filterValue = document.querySelector(".filter-btn.active").getAttribute("data-filter");
+          var grounds = document.getElementById("groundsContainer").getElementsByClassName("col-md-4");
+    
+          for (var i = 0; i < grounds.length; i++) {
+              var area = grounds[i].getAttribute("data-area").toLowerCase();
+              var shopType = grounds[i].getAttribute("data-shop-type");
+              var isVisible = true;
+    
+              if ((searchValue !== "" && !area.includes(searchValue)) || (filterValue !== "" && shopType !== filterValue)) {
+                  isVisible = false;
+              }
+    
+              if (isVisible) {
+                  grounds[i].style.display = "block";
+              } else {
+                  grounds[i].style.display = "none";
+              }
+          }
+      }
+    
+      // Event listener for search button
+      document.getElementById("searchButton").addEventListener("click", filterGrounds);
+    
+      // Event listener for search input field
+      document.getElementById("searchInput").addEventListener("input", filterGrounds);
+    
+      // Event listener for filter buttons
+      var filterButtons = document.querySelectorAll(".filter-btn");
+      filterButtons.forEach(function(button) {
+          button.addEventListener("click", function() {
+              filterButtons.forEach(function(btn) {
+                  btn.classList.remove("active");
+              });
+              this.classList.add("active");
+              filterGrounds();
+          });
+      });
+    </script>
+    
+    </body>
+    </html>
+  {% endblock %}
+    
